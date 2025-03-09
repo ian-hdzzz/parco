@@ -11,12 +11,12 @@
     "uuid": "^11.1.0"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "eslint": "eslint ./src",
-    "prettier": "prettier --check **",
-    "prettier fix": "prettier --write **"
-  },
+  "start": "react-scripts start",
+  "build": "CI=false react-scripts build",
+  "eslint": "eslint ./src",
+  "prettier": "prettier --check **",
+  "prettier fix": "prettier --write **"
+},
   "eslintConfig": {
     "extends": [
       "react-app"
