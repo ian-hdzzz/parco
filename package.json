@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "express": "^4.21.2",
     "qrcode.react": "^4.2.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
@@ -11,11 +12,9 @@
     "uuid": "^11.1.0"
   },
   "scripts": {
-  "start": "react-scripts start",
-  "build": "CI=false react-scripts build",
-  "eslint": "eslint ./src",
-  "prettier": "prettier --check **",
-  "prettier fix": "prettier --write **"
+  "start": "node server.js",
+  "build": "react-scripts build",
+  "dev": "react-scripts start"
 },
   "eslintConfig": {
     "extends": [
