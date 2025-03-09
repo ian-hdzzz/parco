@@ -1,59 +1,46 @@
-import { useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
-import ParkingTicket from "../components/Card/Card";
-import Layout from "../components/Layout/Layout";
-import Divider from "../components/Divider/Divider";
+import React from 'react';
+import { useLocation } from 'react-router-dom';
+
+// components
+import Card from '../components/Card/Card';
+import Layout from '../components/Layout/Layout';
+import History from '../components/History/History';
+import Divider from '../components/Divider/Divider';
+
+interface LocationState {
+  email?: string;
+  timestamp?: string;
+  amount?: number;
+}
 
 const Transactions: React.FC = () => {
+  // Obtener el estado de la navegación
   const location = useLocation();
-  // Recibimos el timestamp como string local
-  const { email, timestamp } = location.state || { email: "guest@example.com", timestamp: new Date().toLocaleString() };
-  
-  const [ticketData, setTicketData] = useState({
-    email: email,
-    ticketNumber: "A-0000",
-    entryTime: timestamp || new Date().toLocaleString(),
-    exitTime: "",
-    amount: 0
-  });
-  
-  useEffect(() => {
-    // Generar datos del ticket usando el email recibido
-    const randomTicketNumber = "A-" + Math.floor(1000 + Math.random() * 9000).toString();
-    
-    // Usar el timestamp recibido o la fecha actual
-    const entryTimeValue = timestamp || new Date().toLocaleString();
-    
-    // Calcular el monto base inicial
-    const baseAmount = 5.00;
-    
-    setTicketData({
-      email: email,
-      ticketNumber: randomTicketNumber,
-      entryTime: entryTimeValue,
-      exitTime: "", // Sin tiempo de salida
-      amount: baseAmount
-    });
-  }, [email, timestamp]);
+  const state = location.state as LocationState || {};
+  const { email, timestamp, amount } = state;
 
   return (
     <Layout>
-      <div className='header'>
-        <h2 style={{ textAlign: 'center', margin: '30px 0' }}>Parking Ticket</h2>
-      </div>
       <Divider />
 
-      <div className="ticket">
-        <ParkingTicket
-          email={ticketData.email}
-          ticketNumber={ticketData.ticketNumber}
-          entryTime={ticketData.entryTime}
-          exitTime={ticketData.exitTime}
-          amount={ticketData.amount}
+      {/* Mostrar el monto a pagar si existe */}
+      {amount !== undefined && (
+        <div className="amount-display">
+          <h2 className="amount-title">Total a pagar:</h2>
+          <p className="amount-value">${amount.toFixed(2)}</p>
+        </div>
+      )}
+
+      <h1 className='title no-select'>Cards</h1>
+
+      <div className='cards'>
+        <Card
+          number='5244 2150 8252 ****'
+          cvcNumber='824'
+          validUntil='10 / 30'
+          cardHolder='CENK SARI'
         />
       </div>
-
-      <Divider />
     </Layout>
   );
 };

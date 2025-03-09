@@ -279,8 +279,9 @@ header .header-button span {
   padding: 10px;
   font-weight: 500;
   border-radius: 5px;
-  background-color: #ff8057;
-  border: 2px solid #ff8057;
+  color: #fff;
+  background: linear-gradient(to right, #8360FE, #1DA4FC);
+
 }
 
 .button.disabled {
@@ -733,26 +734,27 @@ footer {
 .ticket.no-select {
   user-select: none;
 }
-
 /* Contenedor principal del ticket con perspectiva */
 .ticket {
   margin: auto;
+  margin-bottom: 30px;
   width: 350px;
-  perspective: 1000px;
   cursor: pointer;
+  /* Eliminamos la perspectiva ya que no usaremos rotación 3D */
 }
 
-/* Contenedor interno que rotará */
+/* Contenedor interno que ahora solo se elevará */
 .parking-ticket-inner {
   width: 100%;
   position: relative;
-  transition: transform 1s;
-  transform-style: preserve-3d;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  /* Removemos el transform-style: preserve-3d ya que no usaremos efectos 3D */
 }
 
-/* Aplicar la rotación al hacer hover */
+/* Aplicar la elevación al hacer hover en lugar de rotación */
 .ticket:hover .parking-ticket-inner {
-  transform: rotateY(-180deg);
+  transform: translateY(-10px); /* Solo se eleva 10px hacia arriba */
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5); /* Sombra más pronunciada */
 }
 
 /* Estilos comunes para ambos lados */
@@ -765,7 +767,6 @@ footer {
   color: white;
   font-family: 'Arial', sans-serif;
   padding: 30px;
-  position: absolute;
   backface-visibility: hidden;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
   display: flex;
@@ -773,14 +774,20 @@ footer {
   overflow: hidden;
 }
 
-/* El frente se ve por defecto */
+/* Ajustamos las posiciones para que no se use el efecto de rotación */
 .parking-ticket-front {
+  position: relative; /* Cambiamos a relative */
   z-index: 2;
 }
 
-/* El reverso está rotado inicialmente */
+/* El reverso ahora estará oculto por defecto en lugar de rotado */
 .parking-ticket-back {
-  transform: rotateY(180deg);
+  position: absolute; /* Mantenemos absolute para el reverso */
+  top: 0;
+  left: 0;
+  z-index: 1;
+  opacity: 0; /* Ocultamos por completo */
+  /* Eliminamos el transform: rotateY(180deg) */
 }
 
 .ticket-header {
@@ -946,4 +953,53 @@ footer {
   .ticket-qr {
     padding: 10px 0;
   }
+}
+
+/* Estilos para mostrar el monto total */
+.amount-display {
+  background: linear-gradient(145deg, #1a1a1a 0%, #2d2d2d 100%);
+  border-radius: 16px;
+  color: white;
+  padding: 20px;
+  margin-bottom: 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+  transition: transform 0.3s ease;
+}
+
+.amount-display:hover {
+  transform: translateY(-5px);
+}
+
+.amount-title {
+  font-size: 18px;
+  margin-bottom: 10px;
+  opacity: 0.8;
+}
+
+.amount-value {
+  font-size: 32px;
+  font-weight: bold;
+  margin: 0;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+/* Animación de entrada para el monto */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.amount-display {
+  animation: fadeInUp 0.5s ease forwards;
 }

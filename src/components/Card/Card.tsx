@@ -1,199 +1,77 @@
-import React, { useState, useEffect } from 'react';
-import RandomQR from '../QR/QR';  // Importamos el componente QR
-
 // interfaces
 interface IProps {
-  email: string;
-  ticketNumber: string;
-  entryTime: string;
-  exitTime?: string;
-  amount: number;  // Precio base inicial
-}
-
-const ParkingTicket: React.FC<IProps> = ({ 
-  email, 
-  ticketNumber, 
-  entryTime, 
-  exitTime, 
-  amount 
-}) => {
-  const [currentAmount, setCurrentAmount] = useState<number>(amount);
-  const [currentTime, setCurrentTime] = useState<string>(new Date().toLocaleTimeString());
-  const [elapsedSeconds, setElapsedSeconds] = useState<number>(0);
-  const [entryDateTime, setEntryDateTime] = useState<Date>(new Date());
+    number: string;
+    cvcNumber: string;
+    validUntil: string;
+    cardHolder: string;
+  }
   
-  // Valores fijos para incremento
-  const incrementPerTwoMinutes = 5;  // Valor fijo de incremento cada 2 minutos
-  
-  // Inicializar la fecha de entrada correctamente
-  useEffect(() => {
-    try {
-      // Intentar parsear la entrada como fecha
-      const parsedDate = new Date(entryTime);
-      
-      // Verificar si la fecha es válida
-      if (!isNaN(parsedDate.getTime())) {
-        setEntryDateTime(parsedDate);
-      } else {
-        // Si no es válida, usar la fecha actual
-        console.warn("Fecha de entrada inválida, usando la fecha actual");
-        setEntryDateTime(new Date());
-      }
-    } catch (error) {
-      console.error("Error al procesar la fecha de entrada:", error);
-      setEntryDateTime(new Date());
-    }
-  }, [entryTime]);
-  
-  // Función para calcular el precio según el tiempo transcurrido desde el entryTime
-  const calculateUpdatedAmount = (startDate: Date) => {
-    try {
-      // Obtener la fecha y hora actual
-      const now = new Date();
-      
-      // Calcular los minutos transcurridos
-      const minutesDiff = Math.floor((now.getTime() - startDate.getTime()) / (1000 * 60));
-      
-      // Calcular cuántos incrementos de 2 minutos han pasado
-      const increments = Math.floor(minutesDiff / 2);
-      
-      // Calcular el nuevo monto
-      const newAmount = amount + (increments * incrementPerTwoMinutes);
-      
-      return newAmount;
-    } catch (error) {
-      console.error("Error al calcular el monto:", error);
-      return amount;
-    }
-  };
-
-  // Actualizar la hora actual y el monto cada segundo
-  useEffect(() => {
-    // Inicializar el temporizador
-    const timer = setInterval(() => {
-      // Actualizar hora actual
-      const now = new Date();
-      setCurrentTime(now.toLocaleTimeString());
-      
-      try {
-        // Calcular segundos transcurridos desde el inicio
-        const secondsFromEntry = Math.floor((now.getTime() - entryDateTime.getTime()) / 1000);
-        setElapsedSeconds(secondsFromEntry > 0 ? secondsFromEntry : 0);
-        
-        // Calcular y actualizar el monto
-        const newAmount = calculateUpdatedAmount(entryDateTime);
-        setCurrentAmount(newAmount);
-      } catch (error) {
-        console.error("Error en useEffect:", error);
-      }
-    }, 1000);
-    
-    // Limpiar intervalo cuando el componente se desmonte
-    return () => clearInterval(timer);
-  }, [entryDateTime, amount]);
-
-  // Formatear tiempo transcurrido
-  const formatElapsedTime = () => {
-    const hours = Math.floor(elapsedSeconds / 3600);
-    const minutes = Math.floor((elapsedSeconds % 3600) / 60);
-    const seconds = elapsedSeconds % 60;
-    
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-  };
-
-  // Formatear el monto para mostrar
-  const formattedAmount = `$${currentAmount.toFixed(2)}`;
-  
-  // Formatear fecha de entrada para mostrar
-  const formatEntryTime = () => {
-    try {
-      return entryDateTime.toLocaleString();
-    } catch (error) {
-      return "Fecha inválida";
-    }
-  };
-  
-  return (
-    <div className='ticket no-select'>
-      <div className='parking-ticket-inner'>
-        {/* Frente del ticket */}
-        <div className="parking-ticket-front">
-          {/* Logo e indicador contactless */}
-          <div className="ticket-header">
-            <div className="contactless-icon">
-              <svg width="30" height="30" viewBox="0 0 24 24" fill="white">
-                <path d="M12,2C6.48,2,2,6.48,2,12s4.48,10,10,10s10-4.48,10-10S17.52,2,12,2z M8.46,14.45L7.1,13.83c0.28-0.61,0.41-1.24,0.4-1.86c-0.01-0.63-0.14-1.24-0.4-1.8l1.36-0.63c0.35,0.75,0.53,1.56,0.54,2.4C9.01,12.8,8.83,13.64,8.46,14.45z M11.53,16.01l-1.3-0.74c0.52-0.92,0.78-1.98,0.78-3.15c0-1.19-0.27-2.33-0.8-3.4l1.34-0.67c0.64,1.28,0.96,2.65,0.96,4.07C12.51,13.55,12.18,14.86,11.53,16.01z M14.67,17.33l-1.35-0.66c0.78-1.6,1.18-3.18,1.18-4.69c0-1.51-0.4-3.07-1.18-4.64l1.34-0.67C15.56,8.45,16,10.23,16,11.98C16,13.72,15.56,15.52,14.67,17.33z"/>
+  const Card: React.FC<IProps> = ({ number, cvcNumber, validUntil, cardHolder }) => (
+    <>
+      <div className='card no-select'>
+        <div className='card-inner'>
+          <div className='front'>
+            <div className='row'>
+              <svg fill='#ffffff' width='27px' height='39px' viewBox='0 3.71 26.959 38.787'>
+                <path d='M19.709 3.719c.266.043.5.187.656.406 4.125 5.207 6.594 11.781 6.594 18.938 0 7.156-2.469 13.73-6.594 18.937-.195.336-.57.531-.957.492a.9946.9946 0 0 1-.851-.66c-.129-.367-.035-.777.246-1.051 3.855-4.867 6.156-11.023 6.156-17.718 0-6.696-2.301-12.852-6.156-17.719-.262-.317-.301-.762-.102-1.121.204-.36.602-.559 1.008-.504z' />
+                <path d='M13.74 7.563c.231.039.442.164.594.343 3.508 4.059 5.625 9.371 5.625 15.157 0 5.785-2.113 11.097-5.625 15.156-.363.422-1 .472-1.422.109-.422-.363-.472-1-.109-1.422 3.211-3.711 5.156-8.551 5.156-13.843 0-5.293-1.949-10.133-5.156-13.844-.27-.309-.324-.75-.141-1.114.188-.367.578-.582.985-.542h.093z' />
+                <path d='M7.584 11.438c.227.031.438.144.594.312 2.953 2.863 4.781 6.875 4.781 11.313 0 4.433-1.828 8.449-4.781 11.312-.398.387-1.035.383-1.422-.016-.387-.398-.383-1.035.016-1.421 2.582-2.504 4.187-5.993 4.187-9.875 0-3.883-1.605-7.372-4.187-9.875-.321-.282-.426-.739-.266-1.133.164-.395.559-.641.984-.617h.094zM1.178 15.531c.121.02.238.063.344.125 2.633 1.414 4.437 4.215 4.437 7.407 0 3.195-1.797 5.996-4.437 7.406-.492.258-1.102.07-1.36-.422-.257-.492-.07-1.102.422-1.359 2.012-1.075 3.375-3.176 3.375-5.625 0-2.446-1.371-4.551-3.375-5.625-.441-.204-.676-.692-.551-1.165.122-.468.567-.785 1.051-.742h.094z' />
+              </svg>
+              <svg fill='#ffffff' width='80px' height='80px' viewBox='0 0 24.00 24.00'>
+                <g stroke='#cccccc' strokeWidth='0.048' />
+                <g>
+                  <path d='M16.539 9.186a4.155 4.155 0 0 0-1.451-.251c-1.6 0-2.73.806-2.738 1.963-.01.85.803 1.329 1.418 1.613.631.292.842.476.84.737-.004.397-.504.577-.969.577-.639 0-.988-.089-1.525-.312l-.199-.093-.227 1.332c.389.162 1.09.301 1.814.313 1.701 0 2.813-.801 2.826-2.032.014-.679-.426-1.192-1.352-1.616-.563-.275-.912-.459-.912-.738 0-.247.299-.511.924-.511a2.95 2.95 0 0 1 1.213.229l.15.067.227-1.287-.039.009zm4.152-.143h-1.25c-.389 0-.682.107-.852.493l-2.404 5.446h1.701l.34-.893 2.076.002c.049.209.199.891.199.891h1.5l-1.31-5.939zm-10.642-.05h1.621l-1.014 5.942H9.037l1.012-5.944v.002zm-4.115 3.275.168.825 1.584-4.05h1.717l-2.551 5.931H5.139l-1.4-5.022a.339.339 0 0 0-.149-.199 6.948 6.948 0 0 0-1.592-.589l.022-.125h2.609c.354.014.639.125.734.503l.57 2.729v-.003zm12.757.606.646-1.662c-.008.018.133-.343.215-.566l.111.513.375 1.714H18.69v.001h.001z' />
+                </g>
               </svg>
             </div>
-            <div className="brand-logo">PARCO</div>
-          </div>
-
-          {/* Número de ticket */}
-          <div className="ticket-number">
-            {ticketNumber}
-          </div>
-
-          {/* Código QR */}
-          <div className="ticket-qr">
-            <RandomQR />
-          </div>
-
-          {/* Cuerpo del ticket */}
-          <div className="ticket-details">
-            <div className="detail-row">
-              <div className="detail-label">USER</div>
-              <div className="detail-value">{email}</div>
+            <div className='row card-no'>
+              <p>{number}</p>
             </div>
-
-            <div className="detail-row">
-              <div className="detail-label">ENTRY TIME</div>
-              <div className="detail-value">{formatEntryTime()}</div>
+            <div className='row card-holder'>
+              <p>CARD HOLDER</p>
+              <p>VALID UNTIL</p>
             </div>
-
-            {/* <div className="detail-row">
-              <div className="detail-label">CURRENT TIME</div>
-              <div className="detail-value">{currentTime}</div>
-            </div> */}
-
-            <div className="detail-row">
-              <div className="detail-label">ELAPSED TIME</div>
-              <div className="detail-value">{formatElapsedTime()}</div>
-            </div>
-
-            {exitTime && (
-              <div className="detail-row">
-                <div className="detail-label">EXIT TIME</div>
-                <div className="detail-value">{exitTime}</div>
-              </div>
-            )}
-
-            <div className="detail-row">
-              <div className="detail-label">AMOUNT</div>
-              <div className="detail-value">{formattedAmount}</div>
+            <div className='row name'>
+              <p>{cardHolder}</p>
+              <p>{validUntil}</p>
             </div>
           </div>
-
-          {/* Pie del ticket */}
-          <div className="ticket-footer">
-            <p>Thank you for using our parking service.</p>
-            <div className="barcode">|||||||||||||||||||||||||||</div>
-          </div>
-        </div>
-        
-        {/* Reverso del ticket */}
-        <div className="parking-ticket-back">
-          <div className="ticket-back-content">
-            <h2>PARCO</h2>
-            <p>Thank you for choosing our parking services.</p>
-            <p>Please keep this ticket safe until you exit the parking area.</p>
-            <p>For assistance, contact our support at:</p>
-            <p>+1 (555) 123-4567</p>
-            <p>support@parcoapp.com</p>
+          <div className='back'>
+            <div className='bar' />
+            <div className='row card-cvv'>
+              <div className='signature-back' />
+              <p>{cvcNumber}</p>
+            </div>
+            <div className='row card-text'>
+              <p>
+                This card is property of Bank. If found, please return to Bank or to the nearest bank
+                with Visa logo.
+              </p>
+            </div>
+            <div className='row signature'>
+              <p>CUSTOMER SIGNATURE</p>
+              <svg fill='#ffffff' width='80px' height='80px' viewBox='0 0 24.00 24.00'>
+                <g stroke='#cccccc' strokeWidth='0.048' />
+                <g>
+                  <path d='M16.539 9.186a4.155 4.155 0 0 0-1.451-.251c-1.6 0-2.73.806-2.738 1.963-.01.85.803 1.329 1.418 1.613.631.292.842.476.84.737-.004.397-.504.577-.969.577-.639 0-.988-.089-1.525-.312l-.199-.093-.227 1.332c.389.162 1.09.301 1.814.313 1.701 0 2.813-.801 2.826-2.032.014-.679-.426-1.192-1.352-1.616-.563-.275-.912-.459-.912-.738 0-.247.299-.511.924-.511a2.95 2.95 0 0 1 1.213.229l.15.067.227-1.287-.039.009zm4.152-.143h-1.25c-.389 0-.682.107-.852.493l-2.404 5.446h1.701l.34-.893 2.076.002c.049.209.199.891.199.891h1.5l-1.31-5.939zm-10.642-.05h1.621l-1.014 5.942H9.037l1.012-5.944v.002zm-4.115 3.275.168.825 1.584-4.05h1.717l-2.551 5.931H5.139l-1.4-5.022a.339.339 0 0 0-.149-.199 6.948 6.948 0 0 0-1.592-.589l.022-.125h2.609c.354.014.639.125.734.503l.57 2.729v-.003zm12.757.606.646-1.662c-.008.018.133-.343.215-.566l.111.513.375 1.714H18.69v.001h.001z' />
+                </g>
+              </svg>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+  
+      {/* <div className='card-balance flex flex-v-center flex-space-between'>
+        <div className='flex flex-col flex-h-center flex-1 center'>
+          <h3>Balance</h3>
+          <span>€ 783.45</span>
+        </div>
+        <div className='flex flex-col flex-h-center flex-1 center'>
+          <h3>Limit</h3>
+          <span>€ 1250.00</span>
+        </div>
+      </div> */}
+    </>
   );
-};
-
-export default ParkingTicket;
+  
+  export default Card;

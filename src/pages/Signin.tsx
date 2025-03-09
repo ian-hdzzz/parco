@@ -14,7 +14,7 @@ const Signin: React.FC = () => {
     const timestamp = new Date().toLocaleString();
     
     // Navegar a la página de tickets pasando email y timestamp
-    navigate("/cards", { state: { email, timestamp } });
+    navigate("/home", { state: { email, timestamp } });
   };
 
   return (
@@ -25,14 +25,14 @@ const Signin: React.FC = () => {
           Welcome to Parco 2.0
         </h1>
         <p className="text-shadow" style={{ textAlign: "center" }}>
-          Please sign in to your account or sign up a new account.
+          Please sign in to your account
         </p>
 
         <form className="form" noValidate onSubmit={handleSubmit}>
           <div className="form-line">
             <div className="label-line">
               <label htmlFor="email" className="text-shadow">
-                Email
+                User
               </label>
             </div>
             <Input
@@ -40,7 +40,7 @@ const Signin: React.FC = () => {
               required
               name="email"
               type="email"
-              placeholder="Please enter your email"
+              placeholder="Enter your username/email"
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setEmail(e.target.value)
               }
